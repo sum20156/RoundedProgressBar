@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Path
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.ScaleDrawable
@@ -51,6 +54,8 @@ class RoundedProgressBar @JvmOverloads constructor(
     }
 
     // Default values (ProgressBar related)
+    var startColor = ContextCompat.getColor(context, R.color.rpb_default_progress_color)
+    var endColor=startColor
     private val defaultProgressValue = INITIAL_PROGRESS_VALUE
     @ColorInt private val defaultProgressDrawableColor = ContextCompat.getColor(context, R.color.rpb_default_progress_color)
     @ColorInt private val defaultBackgroundDrawableColor = ContextCompat.getColor(context, R.color.rpb_default_progress_bg_color)
@@ -117,9 +122,17 @@ class RoundedProgressBar @JvmOverloads constructor(
         if (newProgressValue != defaultProgressValue) setProgressPercentage(newProgressValue.toDouble())
 
         // Set progress bar color via xml (If exists and isn't the default value)
-        @ColorInt val newProgressDrawableColor = rpbAttributes.getColor(R.styleable.RoundedProgressBar_rpbProgressColor, defaultProgressDrawableColor)
-        if (newProgressDrawableColor != defaultProgressDrawableColor) setProgressDrawableColor(newProgressDrawableColor)
+        @ColorInt val newProgressStartColor = rpbAttributes.getColor(R.styleable.RoundedProgressBar_rpbProgressStartColor ,startColor)
+        if (newProgressStartColor != startColor) {
+            startColor = newProgressStartColor
+            createRoundedProgressDrawable()
+        }
 
+        @ColorInt val newProgressEndColor = rpbAttributes.getColor(R.styleable.RoundedProgressBar_rpbProgressEndColor, endColor)
+        if (newProgressEndColor != endColor) {
+            endColor = newProgressEndColor
+            createRoundedProgressDrawable()
+        }
         // Set progress bar background via xml (If exists and isn't the default value)
         @ColorInt val newBackgroundDrawableColor = rpbAttributes.getColor(R.styleable.RoundedProgressBar_rpbBackgroundColor, defaultBackgroundDrawableColor)
         if (newBackgroundDrawableColor != defaultBackgroundDrawableColor) setBackgroundDrawableColor(newBackgroundDrawableColor)
@@ -283,7 +296,9 @@ class RoundedProgressBar @JvmOverloads constructor(
         )
 
         val roundedDrawable = ShapeDrawable(RoundRectShape(cornerRadiusValues, null, null))
-        roundedDrawable.setColorFilterCompat(progressDrawableColor)
+        roundedDrawable.paint.shader = LinearGradient(
+            1500f,0f,0f,0f,endColor,startColor,Shader.TileMode.CLAMP)
+
         return ScaleDrawable(roundedDrawable, Gravity.START, 1f, -1f)
     }
 
@@ -603,7 +618,8 @@ class RoundedProgressBar @JvmOverloads constructor(
             isRadiusRestricted = state.savedIsRadiusRestricted
             setCornerRadius(cornerRadiusTL, cornerRadiusTR, cornerRadiusBR, cornerRadiusBL)
             setBackgroundDrawableColor(backgroundDrawableColor)
-            setProgressDrawableColor(progressDrawableColor)
+            //setProgressDrawableColor(progressDrawableColor)
+            createRoundedProgressDrawable()
             setProgressPercentage(curProgress, false)
 
             // ProgressTextOverlay related

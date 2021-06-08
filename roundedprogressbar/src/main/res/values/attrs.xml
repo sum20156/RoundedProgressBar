@@ -3,7 +3,8 @@
     <declare-styleable name="RoundedProgressBar">
         <attr name="rpbProgress" format="integer" />
 
-        <attr name="rpbProgressColor" format="reference|color" />
+        <attr name="rpbProgressStartColor" format="reference|color" />
+        <attr name="rpbProgressEndColor" format="reference|color" />
         <attr name="rpbBackgroundColor" format="reference|color" />
         <attr name="rpbProgressTextColor" format="reference|color" />
         <attr name="rpbBackgroundTextColor" format="reference|color" />
